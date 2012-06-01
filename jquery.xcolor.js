@@ -733,420 +733,415 @@
 		}
 		return new xColor(color);
 	}
+	
+	xColor.test = function (col) {
+		var c = new xColor(col);
+		if (c.success) {
+			return c;
+		}
+		return null;
+	};
 
-	/**
-     * @constructor
-     */
-	function xColorMix() {
-		this.test = function (col) {
-			var c = new xColor(col);
-			if (c.success) {
-				return c;
+	xColor.red = function (col) {
+		var c = new xColor(col);
+		if (c.success) {
+			c.g = 0xff;
+			c.b = 0xff;
+			return c;
+		}
+		return null;
+	};
+
+	xColor.blue = function (col) {
+		var c = new xColor(col);
+		if (c.success) {
+			c.r = 0xff;
+			c.g = 0xff;
+			return c;
+		}
+		return null;
+	};
+
+	xColor.green = function (col) {
+		var c = new xColor(col);
+		if (c.success) {
+			c.r = 0xff;
+			c.b = 0xff;
+			return c;
+		}
+		return null;
+	};
+
+	xColor.sepia = function(col) {
+		var c = new xColor(col);
+		// Microsoft's sepia function http://msdn.microsoft.com/en-us/magazine/cc163866.aspx
+		if (c.success) {
+			var r = c.r, g = c.g, b = c.b;
+			c.r = Math.round(r * .393 + g * .769 + b * .189);
+			c.g = Math.round(r * .349 + g * .686 + b * .168);
+			c.b = Math.round(r * .272 + g * .534 + b * .131);
+			return c;
+		}
+		return null;
+	};
+
+	xColor.random = function () {
+		return new xColor([
+			(255 * Math.random())|0,
+			(255 * Math.random())|0,
+			(255 * Math.random())|0
+		]);
+	};
+
+	xColor.inverse = function (col) {
+		var c = new xColor(col);
+		if (c.success) {
+			c.r ^= 0xff;
+			c.g ^= 0xff;
+			c.b ^= 0xff;
+			return c;
+		}
+		return null;
+	};
+
+	xColor.opacity = function (x, y, o) {
+		var a = new xColor(x);
+		var b = new xColor(y);
+		if (a.success & b.success) {
+			if (o > 1) {
+				o /= 100;
 			}
-			return null;
-		};
+			o   = Math.max(o - 1 + b.a, 0);
+			a.r = Math.round((b.r - a.r) * o + a.r);
+			a.g = Math.round((b.g - a.g) * o + a.g);
+			a.b = Math.round((b.b - a.b) * o + a.b);
+			return a;
+		}
+		return null;
+	};
 
-		this.red = function (col) {
-			var c = new xColor(col);
-			if (c.success) {
-				c.g = 0xff;
-				c.b = 0xff;
-				return c;
+	xColor.greyfilter = function (col, formula) {
+		var v, c = new xColor(col);
+		if (c.success) {
+			switch (formula) {
+				case 1:
+					// My own formula
+					v = .35 + 13 * (c.r + c.g + c.b) / 60;
+					break;
+				case 2:
+					// Sun's formula: (1 - avg) / (100 / 35) + avg)
+					v = (13 * (c.r + c.g + c.b) + 5355) / 60;
+					break;
+				default:
+					v = c.r * .3 + c.g * .59 + c.b * .11;
 			}
-			return null;
-		};
+			c.r = c.g = c.b = Math.min(v|0, 255);
+			return c;
+		}
+		return null;
+	};
 
-		this.blue = function (col) {
-			var c = new xColor(col);
-			if (c.success) {
-				c.r = 0xff;
-				c.g = 0xff;
-				return c;
-			}
-			return null;
-		};
+	xColor.webround = function (col) {
+		var c = new xColor(col);
+		if (c.success) {
+			if ((c.r+= 0x33 - c.r % 0x33) > 0xff) c.r = 0xff;
+			if ((c.g+= 0x33 - c.g % 0x33) > 0xff) c.g = 0xff;
+			if ((c.b+= 0x33 - c.b % 0x33) > 0xff) c.b = 0xff;
+			return c;
+		}
+		return null;
+	};
 
-		this.green = function (col) {
-			var c = new xColor(col);
-			if (c.success) {
-				c.r = 0xff;
-				c.b = 0xff;
-				return c;
-			}
-			return null;
-		};
+	xColor.distance = function (x, y) {
+		var a = new xColor(x);
+		var b = new xColor(y);
+		if (a.success & b.success) {
+			// Approximation attempt of http://www.compuphase.com/cmetric.htm
+			return Math.sqrt(3 * (b.r - a.r) * (b.r - a.r) + 4 * (b.g - a.g) * (b.g - a.g) + 2 * (b.b - a.b) * (b.b - a.b));
+		}
+		return null;
+	};
 
-		this.sepia = function(col) {
-			var c = new xColor(col);
-			// Microsoft's sepia function http://msdn.microsoft.com/en-us/magazine/cc163866.aspx
-			if (c.success) {
-				var r = c.r, g = c.g, b = c.b;
-				c.r = Math.round(r * .393 + g * .769 + b * .189);
-				c.g = Math.round(r * .349 + g * .686 + b * .168);
-				c.b = Math.round(r * .272 + g * .534 + b * .131);
-				return c;
-			}
-			return null;
-		};
+	xColor.readable = function (bg, col, size) {
+		// good resource: http://www.hgrebdes.com/colour/spectrum/colourvisibility.html
+		var a = new xColor(col);
+		var b = new xColor(bg);
 
-		this.random = function () {
-			return new xColor([
-				(255 * Math.random())|0,
-				(255 * Math.random())|0,
-				(255 * Math.random())|0
-			]);
-		};
+		size = size || 10;
 
-		this.inverse = function (col) {
-			var c = new xColor(col);
-			if (c.success) {
-				c.r ^= 0xff;
-				c.g ^= 0xff;
-				c.b ^= 0xff;
-				return c;
-			}
-			return null;
-		};
+		if (a.success & b.success) {
+			// but here's my version based on the idea:
+			var diff = b.r * 0.299 + b.g * 0.587 + b.b * 0.114 -
+					   a.r * 0.299 - a.g * 0.587 - a.b * 0.114;
 
-		this.opacity = function (x, y, o) {
-			var a = new xColor(x);
-			var b = new xColor(y);
-			if (a.success & b.success) {
-				if (o > 1) {
-					o /= 100;
+			return !((diff < (1.5 + 141.162 * Math.pow(0.975, size)))
+				  && (diff > (-.5 - 154.709 * Math.pow(0.990, size))));
+		}
+		return null;
+	};
+
+	xColor.combine = function (x, y) {
+		var a = new xColor(x);
+		var b = new xColor(y);
+		if (a.success & b.success) {
+			a.r ^= b.r;
+			a.g ^= b.g;
+			a.b ^= b.b;
+			return a;
+		}
+		return null;
+	};
+
+	xColor.breed = function (x, y) {
+		var a = new xColor(x);
+		var b = new xColor(y);
+		var mask = 0, i = 6;
+		if (a.success & b.success) {
+			while (i--) {
+				if (Math.random() < .5) {
+					mask |= 0x0f << (i << 2);
 				}
-				o   = Math.max(o - 1 + b.a, 0);
-				a.r = Math.round((b.r - a.r) * o + a.r);
-				a.g = Math.round((b.g - a.g) * o + a.g);
-				a.b = Math.round((b.b - a.b) * o + a.b);
-				return a;
 			}
-			return null;
-		};
+			a.r = (a.r & ((mask >> 0x10) & 0xff)) | (b.r & (((mask >> 0x10) & 0xff) ^ 0xff));
+			a.g = (a.g & ((mask >> 0x08) & 0xff)) | (b.g & (((mask >> 0x08) & 0xff) ^ 0xff));
+			a.b = (a.b & ((mask >> 0x00) & 0xff)) | (b.b & (((mask >> 0x00) & 0xff) ^ 0xff));
+			return a;
+		}
+		return null;
+	};
 
-		this.greyfilter = function (col, formula) {
-			var v, c = new xColor(col);
-			if (c.success) {
-				switch (formula) {
-					case 1:
-						// My own formula
-						v = .35 + 13 * (c.r + c.g + c.b) / 60;
-						break;
-					case 2:
-						// Sun's formula: (1 - avg) / (100 / 35) + avg)
-						v = (13 * (c.r + c.g + c.b) + 5355) / 60;
-						break;
-					default:
-						v = c.r * .3 + c.g * .59 + c.b * .11;
-				}
-				c.r = c.g = c.b = Math.min(v|0, 255);
-				return c;
-			}
-			return null;
-		};
+	xColor.additive = function (x, y) {
+		var a = new xColor(x);
+		var b = new xColor(y);
+		if (a.success & b.success) {
+			if ((a.r+= b.r) > 0xff) a.r = 0xff;
+			if ((a.g+= b.g) > 0xff) a.g = 0xff;
+			if ((a.b+= b.b) > 0xff) a.b = 0xff;
+			return a;
+		}
+		return null;
+	};
 
-		this.webround = function (col) {
-			var c = new xColor(col);
-			if (c.success) {
-				if ((c.r+= 0x33 - c.r % 0x33) > 0xff) c.r = 0xff;
-				if ((c.g+= 0x33 - c.g % 0x33) > 0xff) c.g = 0xff;
-				if ((c.b+= 0x33 - c.b % 0x33) > 0xff) c.b = 0xff;
-				return c;
-			}
-			return null;
-		};
+	xColor.subtractive = function (x, y) {
+		var a = new xColor(x);
+		var b = new xColor(y);
+		if (a.success & b.success) {
+			if ((a.r+= b.r - 0xff) < 0) a.r = 0;
+			if ((a.g+= b.g - 0xff) < 0) a.g = 0;
+			if ((a.b+= b.b - 0xff) < 0) a.b = 0;
+			return a;
+		}
+		return null;
+	};
 
-		this.distance = function (x, y) {
-			var a = new xColor(x);
-			var b = new xColor(y);
-			if (a.success & b.success) {
-				// Approximation attempt of http://www.compuphase.com/cmetric.htm
-				return Math.sqrt(3 * (b.r - a.r) * (b.r - a.r) + 4 * (b.g - a.g) * (b.g - a.g) + 2 * (b.b - a.b) * (b.b - a.b));
-			}
-			return null;
-		};
+	xColor.subtract = function (x, y) {
+		var a = new xColor(x);
+		var b = new xColor(y);
+		if (a.success & b.success) {
+			if ((a.r-= b.r) < 0) a.r = 0;
+			if ((a.g-= b.g) < 0) a.g = 0;
+			if ((a.b-= b.b) < 0) a.b = 0;
+			return a;
+		}
+		return null;
+	};
 
-		this.readable = function (bg, col, size) {
-			// good resource: http://www.hgrebdes.com/colour/spectrum/colourvisibility.html
-			var a = new xColor(col);
-			var b = new xColor(bg);
+	xColor.multiply = function (x, y) {
+		var a = new xColor(x);
+		var b = new xColor(y);
+		if (a.success & b.success) {
+			a.r = (a.r / 255 * b.r)|0;
+			a.g = (a.g / 255 * b.g)|0;
+			a.b = (a.b / 255 * b.b)|0;
+			return a;
+		}
+		return null;
+	};
 
-			size = size || 10;
+	xColor.average = function (x, y) {
+		var a = new xColor(x);
+		var b = new xColor(y);
+		if (a.success & b.success) {
+			a.r = (a.r + b.r) >> 1;
+			a.g = (a.g + b.g) >> 1;
+			a.b = (a.b + b.b) >> 1;
+			return a;
+		}
+		return null;
+	};
 
-			if (a.success & b.success) {
-				// but here's my version based on the idea:
-				var diff = b.r * 0.299 + b.g * 0.587 + b.b * 0.114 -
-						   a.r * 0.299 - a.g * 0.587 - a.b * 0.114;
+	xColor.triad = function (col) {
+		var c = new xColor(col);
+		if (c.success) {
+			return [
+				c,
+				new xColor([c.b, c.r, c.g]),
+				new xColor([c.g, c.b, c.r])
+			];
+		}
+		return null;
+	};
 
-				return !((diff < (1.5 + 141.162 * Math.pow(0.975, size)))
-					  && (diff > (-.5 - 154.709 * Math.pow(0.990, size))));
-			}
-			return null;
-		};
+	xColor.tetrad = function (col) {
+		var c = new xColor(col);
+		if (c.success) {
+			return [c,
+				new xColor([c.b, c.r, c.b]),
+				new xColor([c.b, c.g, c.r]),
+				new xColor([c.r, c.b, c.r])
+			];
+		}
+		return null;
+	};
 
-		this.combine = function (x, y) {
-			var a = new xColor(x);
-			var b = new xColor(y);
-			if (a.success & b.success) {
-				a.r ^= b.r;
-				a.g ^= b.g;
-				a.b ^= b.b;
-				return a;
-			}
-			return null;
-		};
+	xColor.gradientlevel = function (x, y, level, deg) {
+		if (undefined === deg) deg = 1;
+		if (level > deg) return null;
 
-		this.breed = function (x, y) {
-			var a = new xColor(x);
-			var b = new xColor(y);
-			var mask = 0, i = 6;
-			if (a.success & b.success) {
-				while (i--) {
-					if (Math.random() < .5) {
-						mask |= 0x0f << (i << 2);
-					}
-				}
-				a.r = (a.r & ((mask >> 0x10) & 0xff)) | (b.r & (((mask >> 0x10) & 0xff) ^ 0xff));
-				a.g = (a.g & ((mask >> 0x08) & 0xff)) | (b.g & (((mask >> 0x08) & 0xff) ^ 0xff));
-				a.b = (a.b & ((mask >> 0x00) & 0xff)) | (b.b & (((mask >> 0x00) & 0xff) ^ 0xff));
-				return a;
-			}
-			return null;
-		};
+		var a = new xColor(x);
+		var b = new xColor(y);
 
-		this.additive = function (x, y) {
-			var a = new xColor(x);
-			var b = new xColor(y);
-			if (a.success & b.success) {
-				if ((a.r+= b.r) > 0xff) a.r = 0xff;
-				if ((a.g+= b.g) > 0xff) a.g = 0xff;
-				if ((a.b+= b.b) > 0xff) a.b = 0xff;
-				return a;
-			}
-			return null;
-		};
+		if (a.success & b.success) {
+			a.r = (a.r + ((b.r - a.r) / deg) * level)|0;
+			a.g = (a.g + ((b.g - a.g) / deg) * level)|0;
+			a.b = (a.b + ((b.b - a.b) / deg) * level)|0;
+			return a;
+		}
+		return null;
+	};
 
-		this.subtractive = function (x, y) {
-			var a = new xColor(x);
-			var b = new xColor(y);
-			if (a.success & b.success) {
-				if ((a.r+= b.r - 0xff) < 0) a.r = 0;
-				if ((a.g+= b.g - 0xff) < 0) a.g = 0;
-				if ((a.b+= b.b - 0xff) < 0) a.b = 0;
-				return a;
-			}
-			return null;
-		};
+	xColor.gradientarray = function(arr, level, deg) {
+		if (level > deg || !arr.length) return null;
+		if (arr.length == 1) {
+			return new xColor(arr[0]);
+		}
 
-		this.subtract = function (x, y) {
-			var a = new xColor(x);
-			var b = new xColor(y);
-			if (a.success & b.success) {
-				if ((a.r-= b.r) < 0) a.r = 0;
-				if ((a.g-= b.g) < 0) a.g = 0;
-				if ((a.b-= b.b) < 0) a.b = 0;
-				return a;
-			}
-			return null;
-		};
+		var e = level * (arr.length - 1) / (deg + 1) | 0;
+		var step = deg / (arr.length - 1);
 
-		this.multiply = function (x, y) {
-			var a = new xColor(x);
-			var b = new xColor(y);
-			if (a.success & b.success) {
-				a.r = (a.r / 255 * b.r)|0;
-				a.g = (a.g / 255 * b.g)|0;
-				a.b = (a.b / 255 * b.b)|0;
-				return a;
-			}
-			return null;
-		};
+		return xColor.gradientlevel(arr[e], arr[e + 1], level - e * step, step);
+	};
 
-		this.average = function (x, y) {
-			var a = new xColor(x);
-			var b = new xColor(y);
-			if (a.success & b.success) {
-				a.r = (a.r + b.r) >> 1;
-				a.g = (a.g + b.g) >> 1;
-				a.b = (a.b + b.b) >> 1;
-				return a;
-			}
-			return null;
-		};
+	xColor.nearestname = function (a) {
+		a = new xColor(a);
+		if (a.success) {
+			return a.getName();
+		}
+		return null;
+	};
 
-		this.triad = function (col) {
-			var c = new xColor(col);
-			if (c.success) {
-				return [
-					c,
-					new xColor([c.b, c.r, c.g]),
-					new xColor([c.g, c.b, c.r])
-				];
-			}
-			return null;
-		};
+	xColor.darken = function (col, by, shade) {
+		if (undefined === by) {
+			by = 1;
+		} else if (by < 0) {
+			return this.lighten(col, -by, shade);
+		}
+		if (undefined === shade) {
+			shade = 32;
+		}
 
-		this.tetrad = function (col) {
-			var c = new xColor(col);
-			if (c.success) {
-				return [c,
-					new xColor([c.b, c.r, c.b]),
-					new xColor([c.b, c.g, c.r]),
-					new xColor([c.r, c.b, c.r])
-				];
-			}
-			return null;
-		};
+		var c = new xColor(col);
+		if (c.success) {
+			if ((c.r -= shade * by) < 0) c.r = 0;
+			if ((c.g -= shade * by) < 0) c.g = 0;
+			if ((c.b -= shade * by) < 0) c.b = 0;
+			return c;
+		}
+		return null;
+	};
 
-		this.gradientlevel = function (x, y, level, deg) {
-			if (undefined === deg) deg = 1;
-			if (level > deg) return null;
+	xColor.lighten = function (col, by, shade) {
+		if (undefined === by) {
+			by = 1;
+		} else if (by < 0) {
+			return this.darken(col, -by, shade);
+		}
+		if (undefined === shade) {
+			shade = 32;
+		}
 
-			var a = new xColor(x);
-			var b = new xColor(y);
+		var c = new xColor(col);
 
-			if (a.success & b.success) {
-				a.r = (a.r + ((b.r - a.r) / deg) * level)|0;
-				a.g = (a.g + ((b.g - a.g) / deg) * level)|0;
-				a.b = (a.b + ((b.b - a.b) / deg) * level)|0;
-				return a;
-			}
-			return null;
-		};
+		if (c.success) {
+			if ((c.r+= shade * by) > 0xff) c.r = 0xff;
+			if ((c.g+= shade * by) > 0xff) c.g = 0xff;
+			if ((c.b+= shade * by) > 0xff) c.b = 0xff;
+			return c;
+		}
+		return null;
+	};
 
-		this.gradientarray = function(arr, level, deg) {
-			if (level > deg || !arr.length) return null;
-			if (arr.length == 1) {
-				return new xColor(arr[0]);
-			}
+	xColor.analogous = function (col, results, slices) {
+		if (undefined === results) {
+			results = 8;
+		}
+		if (undefined === slices) {
+			slices = 30;
+		}
 
-			var e = level * (arr.length - 1) / (deg + 1) | 0;
-			var step = deg / (arr.length - 1);
+		var c = new xColor(col);
 
-			return $.xcolor.gradientlevel(arr[e], arr[e + 1], level - e * step, step);
-		};
+		if (c.success) {
 
-		this.nearestname = function (a) {
-			a = new xColor(a);
-			if (a.success) {
-				return a.getName();
-			}
-			return null;
-		};
+			var hsv = c.getHSV();
+			var part = 360 / slices, ret = [ c ];
 
-		this.darken = function (col, by, shade) {
-			if (undefined === by) {
-				by = 1;
-			} else if (by < 0) {
-				return this.lighten(col, -by, shade);
-			}
-			if (undefined === shade) {
-				shade = 32;
-			}
-
-			var c = new xColor(col);
-			if (c.success) {
-				if ((c.r -= shade * by) < 0) c.r = 0;
-				if ((c.g -= shade * by) < 0) c.g = 0;
-				if ((c.b -= shade * by) < 0) c.b = 0;
-				return c;
-			}
-			return null;
-		};
-
-		this.lighten = function (col, by, shade) {
-			if (undefined === by) {
-				by = 1;
-			} else if (by < 0) {
-				return this.darken(col, -by, shade);
-			}
-			if (undefined === shade) {
-				shade = 32;
-			}
-
-			var c = new xColor(col);
-
-			if (c.success) {
-				if ((c.r+= shade * by) > 0xff) c.r = 0xff;
-				if ((c.g+= shade * by) > 0xff) c.g = 0xff;
-				if ((c.b+= shade * by) > 0xff) c.b = 0xff;
-				return c;
-			}
-			return null;
-		};
-
-		this.analogous = function (col, results, slices) {
-			if (undefined === results) {
-				results = 8;
-			}
-			if (undefined === slices) {
-				slices = 30;
-			}
-
-			var c = new xColor(col);
-
-			if (c.success) {
-
-				var hsv = c.getHSV();
-				var part = 360 / slices, ret = [ c ];
-
-				for (hsv.h = ((hsv.h - (part * results >> 1)) + 720) % 360; --results; ) {
-					hsv.h+= part;
-					hsv.h%= 360;
-					ret.push(new xColor(hsv));
-				}
-				return ret;
-			}
-			return null;
-		};
-
-		this.complementary = function(col) {
-			var c = new xColor(col);
-			if(c.success) {
-				var hsl = c.getHSL();
-				hsl.h = (hsl.h + 180) % 360;
-				return new xColor(hsl);
-			}
-			return null;
-		};
-
-		this.splitcomplement = function (col) {
-			var c = new xColor(col);
-			if (c.success) {
-				var hsv = c.getHSV();
-				var ret = [c];
-				hsv.h += 72;
-				hsv.h %= 360;
+			for (hsv.h = ((hsv.h - (part * results >> 1)) + 720) % 360; --results; ) {
+				hsv.h+= part;
+				hsv.h%= 360;
 				ret.push(new xColor(hsv));
-				hsv.h += 144;
-				hsv.h %= 360;
+			}
+			return ret;
+		}
+		return null;
+	};
+
+	xColor.complementary = function(col) {
+		var c = new xColor(col);
+		if(c.success) {
+			var hsl = c.getHSL();
+			hsl.h = (hsl.h + 180) % 360;
+			return new xColor(hsl);
+		}
+		return null;
+	};
+
+	xColor.splitcomplement = function (col) {
+		var c = new xColor(col);
+		if (c.success) {
+			var hsv = c.getHSV();
+			var ret = [c];
+			hsv.h += 72;
+			hsv.h %= 360;
+			ret.push(new xColor(hsv));
+			hsv.h += 144;
+			hsv.h %= 360;
+			ret.push(new xColor(hsv));
+			return ret;
+		}
+		return null;
+	};
+
+	xColor.monochromatic = function (col, results) {
+		if (undefined === results) {
+			results = 6;
+		}
+
+		var c = new xColor(col);
+		if (c.success) {
+			var hsv = c.getHSV();
+			var ret = [ c ];
+			while (--results) {
+				hsv.v += 20;
+				hsv.v %= 100;
 				ret.push(new xColor(hsv));
-				return ret;
 			}
-			return null;
-		};
-
-		this.monochromatic = function (col, results) {
-			if (undefined === results) {
-				results = 6;
-			}
-
-			var c = new xColor(col);
-			if (c.success) {
-				var hsv = c.getHSV();
-				var ret = [ c ];
-				while (--results) {
-					hsv.v += 20;
-					hsv.v %= 100;
-					ret.push(new xColor(hsv));
-				}
-				return ret;
-			}
-			return null;
-		};
-	}
-
-	$.xcolor = new xColorMix();
+			return ret;
+		}
+		return null;
+	};
+	
+	$.xcolor = $.extend(function(c) { return new xColor(c); }, xColor);
 
 	$.fn.readable = function () {
 		var elem = this[0];
@@ -1174,7 +1169,7 @@
 		}
 
 		// todo: if alpha != 1, use opacity() to calculate correct color on certain element and it's parent
-		return $.xcolor.readable(b, f);
+		return xColor.readable(b, f);
 	};
 
 	$.fn.colorize = function (FROM, TO, TYPE) {
