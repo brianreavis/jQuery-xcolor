@@ -182,7 +182,6 @@
 				s = 255;
 				m = 255;
 			} else if (1 === s) {
-
 				if (undefined === n || 1 === n) {
 					return 1;
 				}
@@ -234,9 +233,10 @@
 			var m = l + l - v;
 
 			return [
-			Math.round(255 *_hue(m, v, h + 1 / 3)),
-			Math.round(255 *_hue(m, v, h)),
-			Math.round(255 *_hue(m, v, h - 1 / 3)) ];
+				Math.round(255 *_hue(m, v, h + 1 / 3)),
+				Math.round(255 *_hue(m, v, h)),
+				Math.round(255 *_hue(m, v, h - 1 / 3))
+			];
 		}
 
 		function _hsv(h,s,v) {
@@ -268,78 +268,71 @@
 			return [v, t, p];
 		}
 
-		this["setColor"] = function (color) {
+		this.setColor = function (color) {
 
 			this.success = true;
 
 			if ("number" === typeof color) {
 
-				this["a"] =((color >> 24) & 0xff) / 255;
-				this["r"] = (color >> 16) & 0xff;
-				this["g"] = (color >>  8) & 0xff;
-				this["b"] = (color      ) & 0xff;
+				this.a =((color >> 24) & 0xff) / 255;
+				this.r = (color >> 16) & 0xff;
+				this.g = (color >>  8) & 0xff;
+				this.b = (color      ) & 0xff;
 				return;
 			}
 
 			while ("object" === typeof color) {
-
 				if (0 in color && 1 in color && 2 in color) {
-					this["a"] = _normalize(color[3], 1);
-					this["r"] = _normalize(color[0]);
-					this["g"] = _normalize(color[1]);
-					this["b"] = _normalize(color[2]);
+					this.a = _normalize(color[3], 1);
+					this.r = _normalize(color[0]);
+					this.g = _normalize(color[1]);
+					this.b = _normalize(color[2]);
 					return;
 				} else if ('r' in color && 'g' in color && 'b' in color) {
-					this["a"] = _normalize(color["a"], 1);
-					this["r"] = _normalize(color["r"]);
-					this["g"] = _normalize(color["g"]);
-					this["b"] = _normalize(color["b"]);
+					this.a = _normalize(color.a, 1);
+					this.r = _normalize(color.r);
+					this.g = _normalize(color.g);
+					this.b = _normalize(color.b);
 					return;
 				} else if ('h' in color && 's' in color) {
-
 					var rgb;
-
 					if ('l' in color) {
-						rgb = _hsl(color["h"], color["s"], color["l"]);
+						rgb = _hsl(color.h, color.s, color.l);
 					} else if ('v' in color) {
-						rgb = _hsv(color["h"], color["s"], color["v"]);
+						rgb = _hsv(color.h, color.s, color.v);
 					} else if ('b' in color) {
-						rgb = _hsv(color["h"], color["s"], color["b"]);
+						rgb = _hsv(color.h, color.s, color.b);
 					} else {
 						break;
 					}
 
-					this["a"] = _normalize(color["a"], 1);
-					this["r"] = rgb[0];
-					this["g"] = rgb[1];
-					this["b"] = rgb[2];
+					this.a = _normalize(color.a, 1);
+					this.r = rgb[0];
+					this.g = rgb[1];
+					this.b = rgb[2];
 					return;
 				}
 				break;
 			}
 
 			if ("string" === typeof color) {
-
 				color = color.toLowerCase().replace(/[^a-z0-9,.()#%]/g, '');
-
 				var part, c;
 
 				if ('transparent' === color) {
-					this["a"] = /* void */
-					this["r"] = /* void */
-					this["g"] = /* void */
-					this["b"] = 0;
+					this.a = /* void */
+					this.r = /* void */
+					this.g = /* void */
+					this.b = 0;
 					return;
 				}
 
 				if ('rand' === color) {
-
 					c = Math.random() * 0xffffff|0;
-
-					this["a"] = 1;
-					this["r"] = ((c >> 16) & 0xff);
-					this["g"] = ((c >>  8) & 0xff);
-					this["b"] = ((c      ) & 0xff);
+					this.a = 1;
+					this.r = ((c >> 16) & 0xff);
+					this.g = ((c >>  8) & 0xff);
+					this.b = ((c      ) & 0xff);
 					return;
 				}
 
@@ -349,37 +342,37 @@
 
 				// #ff9000, #ff0000
 				if ((part = /^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/.exec(color))) {
-					this["a"] = 1;
-					this["r"] = parseInt(part[1], 16);
-					this["g"] = parseInt(part[2], 16);
-					this["b"] = parseInt(part[3], 16);
+					this.a = 1;
+					this.r = parseInt(part[1], 16);
+					this.g = parseInt(part[2], 16);
+					this.b = parseInt(part[3], 16);
 					return;
 				}
 
 				// #f00, fff
 				if ((part = /^#?([0-9a-f])([0-9a-f])([0-9a-f])$/.exec(color))) {
-					this["a"] = 1;
-					this["r"] = parseInt(part[1] + part[1], 16);
-					this["g"] = parseInt(part[2] + part[2], 16);
-					this["b"] = parseInt(part[3] + part[3], 16);
+					this.a = 1;
+					this.r = parseInt(part[1] + part[1], 16);
+					this.g = parseInt(part[2] + part[2], 16);
+					this.b = parseInt(part[3] + part[3], 16);
 					return;
 				}
 
 				// rgb(1, 234, 56)
 				if ((part = /^rgba?\((\d{1,3}),(\d{1,3}),(\d{1,3})(,([0-9.]+))?\)$/.exec(color))) {
-					this["a"] = _normalize(part[5], 1);
-					this["r"] = _normalize(part[1]);
-					this["g"] = _normalize(part[2]);
-					this["b"] = _normalize(part[3]);
+					this.a = _normalize(part[5], 1);
+					this.r = _normalize(part[1]);
+					this.g = _normalize(part[2]);
+					this.b = _normalize(part[3]);
 					return;
 				}
 
 				// rgb(66%, 55%, 44%) in [0,100]%, [0,100]%, [0,100]%
 				if ((part = /^rgba?\(([0-9.]+\%),([0-9.]+\%),([0-9.]+\%)(,([0-9.]+)\%?)?\)$/.exec(color))) {
-					this["a"] = _normalize(part[5], 1);
-					this["r"] = Math.round(2.55 * _normalize(part[1], 100));
-					this["g"] = Math.round(2.55 * _normalize(part[2], 100));
-					this["b"] = Math.round(2.55 * _normalize(part[3], 100));
+					this.a = _normalize(part[5], 1);
+					this.r = Math.round(2.55 * _normalize(part[1], 100));
+					this.g = Math.round(2.55 * _normalize(part[2], 100));
+					this.b = Math.round(2.55 * _normalize(part[3], 100));
 					return;
 				}
 
@@ -394,105 +387,94 @@
 
 					c = func(parseInt(part[2], 10), parseInt(part[3], 10), parseInt(part[4], 10));
 
-					this["a"] = _normalize(part[6], 1);
-					this["r"] = c[0];
-					this["g"] = c[1];
-					this["b"] = c[2];
+					this.a = _normalize(part[6], 1);
+					this.r = c[0];
+					this.g = c[1];
+					this.b = c[2];
 					return;
 				}
 
 				// 1, 234, 56
 				if ((part = /^(\d{1,3}),(\d{1,3}),(\d{1,3})(,([0-9.]+))?$/.exec(color))) {
-					this["a"] = _normalize(part[5], 1);
-					this["r"] = _normalize(part[1]);
-					this["g"] = _normalize(part[2]);
-					this["b"] = _normalize(part[3]);
+					this.a = _normalize(part[5], 1);
+					this.r = _normalize(part[1]);
+					this.g = _normalize(part[2]);
+					this.b = _normalize(part[3]);
 					return;
 				}
 			}
 			this.success = false;
 		};
 
-		this["getColor"] = function (type) {
-
+		this.getColor = function (type) {
 			if (undefined !== type) switch (type.toLowerCase()) {
 				case "rgb":
-					return this["getRGB"]();
+					return this.getRGB();
 				case "hsv":
 				case "hsb":
-					return this["getHSV"]();
+					return this.getHSV();
 				case "hsl":
-					return this["getHSL"]();
+					return this.getHSL();
 				case "int":
-					return this["getInt"]();
+					return this.getInt();
 				case "array":
-					return this["getArray"]();
+					return this.getArray();
 				case "fraction":
-					return this["getFraction"]();
+					return this.getFraction();
 				case "css":
 				case "style":
-					return this["getCSS"]();
+					return this.getCSS();
 				case "name":
-					return this["getName"]();
+					return this.getName();
 			}
-			return this["getHex"]();
+			return this.getHex();
 		};
 
-		this["getRGB"] = function () {
-
+		this.getRGB = function () {
 			if (this.success) {
-
 				return {
-					"r": this["r"],
-					"g": this["g"],
-					"b": this["b"],
-					"a": this["a"]
+					r: this.r,
+					g: this.g,
+					b: this.b,
+					a: this.a
 				};
 			}
 			return null;
 		};
 
-		this["getCSS"] = function () {
-
+		this.getCSS = function () {
 			if (this.success) {
-
-				if (0 === this["a"]) {
+				if (0 === this.a) {
 					return "transparent";
 				}
-
-				if (1 === this["a"]) {
-					return 'rgb(' + this["r"] + ',' + this["g"] + ',' + this["b"] + ')';
+				if (1 === this.a) {
+					return 'rgb(' + this.r + ',' + this.g + ',' + this.b + ')';
 				}
-				return _RGBAtoCSS(this["r"], this["g"], this["b"], this["a"]);
+				return _RGBAtoCSS(this.r, this.g, this.b, this.a);
 			}
 			return null;
 		};
 
-		this["getArray"] = function () {
-
+		this.getArray = function () {
 			if (this.success) {
-				return [this["r"], this["g"], this["b"], 100 * this["a"]|0];
+				return [this.r, this.g, this.b, 100 * this.a|0];
 			}
 			return null;
 		};
 
-		this["getName"] = function () {
-
+		this.getName = function () {
 			if (this.success) {
-
 				var lowest = null;
 				var lowest_ndx;
-
 				var table = color_names;
-
-				var a = this["getHSL"]();
+				var a = this.getHSL();
 
 				for (var i in table) {
 
 					/* We do not handle transparency */
-					var b = new xColor(table[i])["getHSL"]();
+					var b = new xColor(table[i]).getHSL();
 
-					var tmp = Math.sqrt(.5 * (a["h"] - b["h"]) * (a["h"] - b["h"]) + .5 * (a["s"] - b["s"]) * (a["s"] - b["s"]) + (a["l"] - b["l"]) * (a["l"] - b["l"]));
+					var tmp = Math.sqrt(.5 * (a.h - b.h) * (a.h - b.h) + .5 * (a.s - b.s) * (a.s - b.s) + (a.l - b.l) * (a.l - b.l));
 
 					if (null === lowest || tmp < lowest) {
 						lowest = tmp;
@@ -504,28 +486,26 @@
 			return null;
 		};
 
-		this["getFraction"] = function () {
-
+		this.getFraction = function () {
 			if (this.success) {
-
 				return {
-					"r": this["r"] / 255,
-					"g": this["g"] / 255,
-					"b": this["b"] / 255,
-					"a": this["a"]
+					"r": this.r / 255,
+					"g": this.g / 255,
+					"b": this.b / 255,
+					"a": this.a
 				};
 			}
 			return null;
 		};
 
-		this["getHSL"] = function () {
+		this.getHSL = function () {
 
 			// inspiration: http://130.113.54.154/~monger/hsl-rgb.html
 			if (this.success) {
 
-				var r = this["r"] / 255;
-				var g = this["g"] / 255;
-				var b = this["b"] / 255;
+				var r = this.r / 255;
+				var g = this.g / 255;
+				var b = this.b / 255;
 
 				var min = Math.min(r, g, b);
 				var max = Math.max(r, g, b);
@@ -552,19 +532,19 @@
 					"h": Math.round( 60 * ((6 + h) % 6)),
 					"s": Math.round(100 * s),
 					"l": Math.round(100 * l),
-					"a": this["a"]
+					"a": this.a
 				};
 			}
 			return null;
 		};
 
-		this["getHSV"] = function () {
+		this.getHSV = function () {
 
 			if (this.success) {
 
-				var r = this["r"] / 255;
-				var g = this["g"] / 255;
-				var b = this["b"] / 255;
+				var r = this.r / 255;
+				var g = this.g / 255;
+				var b = this.b / 255;
 
 				/*
 				if (r > g) {
@@ -608,25 +588,24 @@
 					"h": Math.round( 60 * ((6 + h) % 6)),
 					"s": Math.round(100 * s),
 					"v": Math.round(100 * v),
-					"a": this["a"]
+					"a": this.a
 				};
 			}
 			return null;
 		};
 
-		this["getHex"] = function () {
+		this.getHex = function () {
 
 			if (this.success) {
-
 				var chars = "0123456789abcdef";
 
-				var r1 = this["r"] >> 4;
-				var g1 = this["g"] >> 4;
-				var b1 = this["b"] >> 4;
+				var r1 = this.r >> 4;
+				var g1 = this.g >> 4;
+				var b1 = this.b >> 4;
 
-				var r2 = this["r"] & 0xf;
-				var g2 = this["g"] & 0xf;
-				var b2 = this["b"] & 0xf;
+				var r2 = this.r & 0xf;
+				var g2 = this.g & 0xf;
+				var b2 = this.b & 0xf;
 
 				if (0 === ((r1 ^ r2) | (g1 ^ g2) | (b1 ^ b2))) {
 					return '#' + chars.charAt(r1) + chars.charAt(g1) + chars.charAt(b1);
@@ -639,40 +618,38 @@
 			return null;
 		};
 
-		this["getInt"] = function (alpha) {
-
+		this.getInt = function (alpha) {
 			if (this.success) {
 				if (undefined !== alpha) {
-					return ((100 * this["a"]|0) << 24 ^ this["r"] << 16 ^ this["g"] << 8 ^ this["b"]);
+					return ((100 * this.a|0) << 24 ^ this.r << 16 ^ this.g << 8 ^ this.b);
 				}
-				return (this["r"] << 16 ^ this["g"] << 8 ^ this["b"]) & 0xffffff;
+				return (this.r << 16 ^ this.g << 8 ^ this.b) & 0xffffff;
 			}
 			return null;
 		};
 
-		this["toString"] = function () {
-			return this["getHex"]();
+		this.toString = function () {
+			return this.getHex();
 		};
 
-		this["setColor"](color);
+		this.setColor(color);
 	}
 
-	$["each"](['color', 'backgroundColor', 'borderColor', 'borderTopColor', 'borderBottomColor', 'borderLeftColor', 'borderRightColor', 'outlineColor'], function(i, attr) {
+	$.each(['color', 'backgroundColor', 'borderColor', 'borderTopColor', 'borderBottomColor', 'borderLeftColor', 'borderRightColor', 'outlineColor'], function(i, attr) {
 
-		$["cssHooks"][attr] = {
-
+		$.cssHooks[attr] = {
 			"set": function(elem, value) {
-				elem["style"][attr] = (new xColor(value))["getCSS"]();
+				elem.style[attr] = (new xColor(value)).getCSS();
 			}
 		};
 
-		$["fx"]["step"][attr] = function(fx) {
+		$.fx.step[attr] = function(fx) {
 
-			if (undefined === fx["xinit"]) {
+			if (undefined === fx.xinit) {
 
-				if ("string" === typeof fx["end"] && -1 !== fx["end"].indexOf(";")) {
+				if ("string" === typeof fx.end && -1 !== fx.end.indexOf(";")) {
 
-					var x, arr = fx["end"].split(";");
+					var x, arr = fx.end.split(";");
 
 					if (arr.length > 2) {
 
@@ -680,26 +657,26 @@
 							if (-1 === arr[x].indexOf('native')) {
 								arr[x] = new xColor(arr[x]);
 							} else {
-								arr[x] = findColor(fx["elem"], attr);
+								arr[x] = findColor(fx.elem, attr);
 							}
 						}
-						fx["start"] = null;
-						fx["end"]   = arr;
+						fx.start = null;
+						fx.end   = arr;
 					} else {
-						fx["start"] = new xColor(arr[0]);
-						fx["end"]   = new xColor(arr[1]);
+						fx.start = new xColor(arr[0]);
+						fx.end   = new xColor(arr[1]);
 					}
 				} else {
-					fx["start"] = findColor(fx["elem"], attr);
-					fx["end"] = new xColor(fx["end"]);
+					fx.start = findColor(fx.elem, attr);
+					fx.end = new xColor(fx.end);
 				}
 
-				fx["xinit"] = 1;
+				fx.xinit = 1;
 			}
 
-			var S = fx["start"];
-			var E = fx["end"];
-			var P = fx["pos"];
+			var S = fx.start;
+			var E = fx.end;
+			var P = fx.pos;
 
 			if (null === S) {
 				var m = P * (E.length - 1),
@@ -709,26 +686,26 @@
 				P = m - n;
 			}
 
-			fx["elem"]["style"][attr] =_RGBAtoCSS(
-				S["r"] + P * (E["r"] - S["r"])|0,
-				S["g"] + P * (E["g"] - S["g"])|0,
-				S["b"] + P * (E["b"] - S["b"])|0,
-				S["a"] + P * (E["a"] - S["a"])
+			fx.elem.style[attr] =_RGBAtoCSS(
+				S.r + P * (E.r - S.r)|0,
+				S.g + P * (E.g - S.g)|0,
+				S.b + P * (E.b - S.b)|0,
+				S.a + P * (E.a - S.a)
 			);
 		}
 	});
 
 	$(function() {
 		var div = document.createElement("div"),
-			div_style = div["style"];
+			div_style = div.style;
 
 		_RGBAtoCSS = function(r, g, b, a) {
 			return "rgba(" + r + "," + g + "," + b + "," + a + ")";
 		};
 
-		div_style["cssText"] = "background-color:rgba(1,1,1,.5)";
+		div_style.cssText = "background-color:rgba(1,1,1,.5)";
 
-		if (!($["support"]["rgba"] = div_style["backgroundColor"].indexOf("rgba") > -1)) {
+		if (!($.support.rgba = div_style.backgroundColor.indexOf("rgba") > -1)) {
 			_RGBAtoCSS = function(r, g, b) {
 				return "rgb(" + r + "," + g + "," + b + ")";
 			};
@@ -736,19 +713,17 @@
 	});
 
 	function findColor(elem, attr) {
-
 		var color = "";
-
 		do {
-			color = $["curCSS"](elem, attr);
+			color = $.curCSS(elem, attr);
 
-			if ("" !== color && "transparent" !== color && "rgba(0, 0, 0, 0)" !== color || $["nodeName"](elem, "body")) break;
+			if ("" !== color && "transparent" !== color && "rgba(0, 0, 0, 0)" !== color || $.nodeName(elem, "body")) break;
 
-		} while ((elem = elem["parentNode"]));
+		} while ((elem = elem.parentNode));
 
 		if ("" === color) {
 
-			if ($["support"]["rgba"]) {
+			if ($.support.rgba) {
 				color = "transparent";
 			} else if ("backgroundColor" === attr) {
 				color = "white";
@@ -763,179 +738,145 @@
      * @constructor
      */
 	function xColorMix() {
-
-		this["test"] = function (col) {
-
+		this.test = function (col) {
 			var c = new xColor(col);
-
 			if (c.success) {
 				return c;
 			}
 			return null;
 		};
 
-		this["red"] = function (col) {
-
+		this.red = function (col) {
 			var c = new xColor(col);
-
 			if (c.success) {
-				c["g"] = 0xff;
-				c["b"] = 0xff;
+				c.g = 0xff;
+				c.b = 0xff;
 				return c;
 			}
 			return null;
 		};
 
-		this["blue"] = function (col) {
-
+		this.blue = function (col) {
 			var c = new xColor(col);
-
 			if (c.success) {
-				c["r"] = 0xff;
-				c["g"] = 0xff;
+				c.r = 0xff;
+				c.g = 0xff;
 				return c;
 			}
 			return null;
 		};
 
-		this["green"] = function (col) {
-
+		this.green = function (col) {
 			var c = new xColor(col);
-
 			if (c.success) {
-				c["r"] = 0xff;
-				c["b"] = 0xff;
+				c.r = 0xff;
+				c.b = 0xff;
 				return c;
 			}
 			return null;
 		};
 
-		this["sepia"] = function(col) {
-
+		this.sepia = function(col) {
 			var c = new xColor(col);
-
 			// Microsoft's sepia function http://msdn.microsoft.com/en-us/magazine/cc163866.aspx
 			if (c.success) {
-
-				var r = c["r"], g = c["g"], b = c["b"];
-
-				c["r"] = Math.round(r * .393 + g * .769 + b * .189);
-				c["g"] = Math.round(r * .349 + g * .686 + b * .168);
-				c["b"] = Math.round(r * .272 + g * .534 + b * .131);
-
+				var r = c.r, g = c.g, b = c.b;
+				c.r = Math.round(r * .393 + g * .769 + b * .189);
+				c.g = Math.round(r * .349 + g * .686 + b * .168);
+				c.b = Math.round(r * .272 + g * .534 + b * .131);
 				return c;
 			}
 			return null;
 		};
 
-		this["random"] = function () {
-
+		this.random = function () {
 			return new xColor([
 				(255 * Math.random())|0,
 				(255 * Math.random())|0,
 				(255 * Math.random())|0
-				]);
+			]);
 		};
 
-		this["inverse"] = function (col) {
-
+		this.inverse = function (col) {
 			var c = new xColor(col);
-
 			if (c.success) {
-				c["r"]^= 0xff;
-				c["g"]^= 0xff;
-				c["b"]^= 0xff;
+				c.r ^= 0xff;
+				c.g ^= 0xff;
+				c.b ^= 0xff;
 				return c;
 			}
 			return null;
 		};
 
-		this["opacity"] = function (x, y, o) {
-
+		this.opacity = function (x, y, o) {
 			var a = new xColor(x);
 			var b = new xColor(y);
-
 			if (a.success & b.success) {
-
 				if (o > 1) {
-					o/= 100;
+					o /= 100;
 				}
-
-				o = Math.max(o - 1 + b["a"], 0);
-
-				a["r"] = Math.round((b["r"] - a["r"]) * o + a["r"]);
-				a["g"] = Math.round((b["g"] - a["g"]) * o + a["g"]);
-				a["b"] = Math.round((b["b"] - a["b"]) * o + a["b"]);
-
+				o   = Math.max(o - 1 + b.a, 0);
+				a.r = Math.round((b.r - a.r) * o + a.r);
+				a.g = Math.round((b.g - a.g) * o + a.g);
+				a.b = Math.round((b.b - a.b) * o + a.b);
 				return a;
 			}
 			return null;
 		};
 
-		this["greyfilter"] = function (col, formula) {
-
+		this.greyfilter = function (col, formula) {
 			var v, c = new xColor(col);
-
 			if (c.success) {
 				switch (formula) {
 					case 1:
 						// My own formula
-						v = .35 + 13 * (c["r"] + c["g"] + c["b"]) / 60;
+						v = .35 + 13 * (c.r + c.g + c.b) / 60;
 						break;
 					case 2:
 						// Sun's formula: (1 - avg) / (100 / 35) + avg)
-						v = (13 * (c["r"] + c["g"] + c["b"]) + 5355) / 60;
+						v = (13 * (c.r + c.g + c.b) + 5355) / 60;
 						break;
 					default:
-						v = c["r"] * .3 + c["g"] * .59 + c["b"] * .11;
+						v = c.r * .3 + c.g * .59 + c.b * .11;
 				}
-				c["r"] = c["g"] = c["b"] = Math.min(v|0, 255);
-
+				c.r = c.g = c.b = Math.min(v|0, 255);
 				return c;
 			}
 			return null;
 		};
 
-		this["webround"] = function (col) {
-
+		this.webround = function (col) {
 			var c = new xColor(col);
-
 			if (c.success) {
-				if ((c["r"]+= 0x33 - c["r"] % 0x33) > 0xff) c["r"] = 0xff;
-				if ((c["g"]+= 0x33 - c["g"] % 0x33) > 0xff) c["g"] = 0xff;
-				if ((c["b"]+= 0x33 - c["b"] % 0x33) > 0xff) c["b"] = 0xff;
+				if ((c.r+= 0x33 - c.r % 0x33) > 0xff) c.r = 0xff;
+				if ((c.g+= 0x33 - c.g % 0x33) > 0xff) c.g = 0xff;
+				if ((c.b+= 0x33 - c.b % 0x33) > 0xff) c.b = 0xff;
 				return c;
 			}
 			return null;
 		};
 
-		this["distance"] = function (x, y) {
-
+		this.distance = function (x, y) {
 			var a = new xColor(x);
 			var b = new xColor(y);
-
 			if (a.success & b.success) {
 				// Approximation attempt of http://www.compuphase.com/cmetric.htm
-				return Math.sqrt(3 * (b["r"] - a["r"]) * (b["r"] - a["r"]) + 4 * (b["g"] - a["g"]) * (b["g"] - a["g"]) + 2 * (b["b"] - a["b"]) * (b["b"] - a["b"]));
+				return Math.sqrt(3 * (b.r - a.r) * (b.r - a.r) + 4 * (b.g - a.g) * (b.g - a.g) + 2 * (b.b - a.b) * (b.b - a.b));
 			}
 			return null;
 		};
 
-		this["readable"] = function (bg, col, size) {
-
-			// good ressource: http://www.hgrebdes.com/colour/spectrum/colourvisibility.html
-
+		this.readable = function (bg, col, size) {
+			// good resource: http://www.hgrebdes.com/colour/spectrum/colourvisibility.html
 			var a = new xColor(col);
 			var b = new xColor(bg);
 
 			size = size || 10;
 
 			if (a.success & b.success) {
-
 				// but here's my version based on the idea:
-
-				var diff = b["r"] * 0.299 + b["g"] * 0.587 + b["b"] * 0.114 -
-						   a["r"] * 0.299 - a["g"] * 0.587 - a["b"] * 0.114;
+				var diff = b.r * 0.299 + b.g * 0.587 + b.b * 0.114 -
+						   a.r * 0.299 - a.g * 0.587 - a.b * 0.114;
 
 				return !((diff < (1.5 + 141.162 * Math.pow(0.975, size)))
 					  && (diff > (-.5 - 154.709 * Math.pow(0.990, size))));
@@ -943,170 +884,138 @@
 			return null;
 		};
 
-		this["combine"] = function (x, y) {
-
+		this.combine = function (x, y) {
 			var a = new xColor(x);
 			var b = new xColor(y);
-
 			if (a.success & b.success) {
-				a["r"]^= b["r"];
-				a["g"]^= b["g"];
-				a["b"]^= b["b"];
+				a.r ^= b.r;
+				a.g ^= b.g;
+				a.b ^= b.b;
 				return a;
 			}
 			return null;
 		};
 
-		this["breed"] = function (x, y) {
-
+		this.breed = function (x, y) {
 			var a = new xColor(x);
 			var b = new xColor(y);
-
 			var mask = 0, i = 6;
-
 			if (a.success & b.success) {
-
 				while (i--) {
 					if (Math.random() < .5) {
-						mask|= 0x0f << (i << 2);
+						mask |= 0x0f << (i << 2);
 					}
 				}
-
-				a["r"] = (a["r"] & ((mask >> 0x10) & 0xff)) | (b["r"] & (((mask >> 0x10) & 0xff) ^ 0xff));
-				a["g"] = (a["g"] & ((mask >> 0x08) & 0xff)) | (b["g"] & (((mask >> 0x08) & 0xff) ^ 0xff));
-				a["b"] = (a["b"] & ((mask >> 0x00) & 0xff)) | (b["b"] & (((mask >> 0x00) & 0xff) ^ 0xff));
+				a.r = (a.r & ((mask >> 0x10) & 0xff)) | (b.r & (((mask >> 0x10) & 0xff) ^ 0xff));
+				a.g = (a.g & ((mask >> 0x08) & 0xff)) | (b.g & (((mask >> 0x08) & 0xff) ^ 0xff));
+				a.b = (a.b & ((mask >> 0x00) & 0xff)) | (b.b & (((mask >> 0x00) & 0xff) ^ 0xff));
 				return a;
 			}
 			return null;
 		};
 
-		this["additive"] = function (x, y) {
-
+		this.additive = function (x, y) {
 			var a = new xColor(x);
 			var b = new xColor(y);
-
 			if (a.success & b.success) {
-
-				if ((a["r"]+= b["r"]) > 0xff) a["r"] = 0xff;
-				if ((a["g"]+= b["g"]) > 0xff) a["g"] = 0xff;
-				if ((a["b"]+= b["b"]) > 0xff) a["b"] = 0xff;
-
+				if ((a.r+= b.r) > 0xff) a.r = 0xff;
+				if ((a.g+= b.g) > 0xff) a.g = 0xff;
+				if ((a.b+= b.b) > 0xff) a.b = 0xff;
 				return a;
 			}
 			return null;
 		};
 
-		this["subtractive"] = function (x, y) {
-
+		this.subtractive = function (x, y) {
 			var a = new xColor(x);
 			var b = new xColor(y);
-
 			if (a.success & b.success) {
-
-				if ((a["r"]+= b["r"] - 0xff) < 0) a["r"] = 0;
-				if ((a["g"]+= b["g"] - 0xff) < 0) a["g"] = 0;
-				if ((a["b"]+= b["b"] - 0xff) < 0) a["b"] = 0;
-
+				if ((a.r+= b.r - 0xff) < 0) a.r = 0;
+				if ((a.g+= b.g - 0xff) < 0) a.g = 0;
+				if ((a.b+= b.b - 0xff) < 0) a.b = 0;
 				return a;
 			}
 			return null;
 		};
 
-		this["subtract"] = function (x, y) {
-
+		this.subtract = function (x, y) {
 			var a = new xColor(x);
 			var b = new xColor(y);
-
 			if (a.success & b.success) {
-
-				if ((a["r"]-= b["r"]) < 0) a["r"] = 0;
-				if ((a["g"]-= b["g"]) < 0) a["g"] = 0;
-				if ((a["b"]-= b["b"]) < 0) a["b"] = 0;
-
+				if ((a.r-= b.r) < 0) a.r = 0;
+				if ((a.g-= b.g) < 0) a.g = 0;
+				if ((a.b-= b.b) < 0) a.b = 0;
 				return a;
 			}
 			return null;
 		};
 
-		this["multiply"] = function (x, y) {
-
+		this.multiply = function (x, y) {
 			var a = new xColor(x);
 			var b = new xColor(y);
-
 			if (a.success & b.success) {
-				a["r"] = (a["r"] / 255 * b["r"])|0;
-				a["g"] = (a["g"] / 255 * b["g"])|0;
-				a["b"] = (a["b"] / 255 * b["b"])|0;
+				a.r = (a.r / 255 * b.r)|0;
+				a.g = (a.g / 255 * b.g)|0;
+				a.b = (a.b / 255 * b.b)|0;
 				return a;
 			}
 			return null;
 		};
 
-		this["average"] = function (x, y) {
-
+		this.average = function (x, y) {
 			var a = new xColor(x);
 			var b = new xColor(y);
-
 			if (a.success & b.success) {
-				a["r"] = (a["r"] + b["r"]) >> 1;
-				a["g"] = (a["g"] + b["g"]) >> 1;
-				a["b"] = (a["b"] + b["b"]) >> 1;
+				a.r = (a.r + b.r) >> 1;
+				a.g = (a.g + b.g) >> 1;
+				a.b = (a.b + b.b) >> 1;
 				return a;
 			}
 			return null;
 		};
 
-		this["triad"] = function (col) {
-
+		this.triad = function (col) {
 			var c = new xColor(col);
-
 			if (c.success) {
-
-				return [c,
-				new xColor([c["b"], c["r"], c["g"]]),
-				new xColor([c["g"], c["b"], c["r"]])];
+				return [
+					c,
+					new xColor([c.b, c.r, c.g]),
+					new xColor([c.g, c.b, c.r])
+				];
 			}
 			return null;
 		};
 
-		this["tetrad"] = function (col) {
-
+		this.tetrad = function (col) {
 			var c = new xColor(col);
-
 			if (c.success) {
-
 				return [c,
-				new xColor([c["b"], c["r"], c["b"]]),
-				new xColor([c["b"], c["g"], c["r"]]),
-				new xColor([c["r"], c["b"], c["r"]])];
+					new xColor([c.b, c.r, c.b]),
+					new xColor([c.b, c.g, c.r]),
+					new xColor([c.r, c.b, c.r])
+				];
 			}
 			return null;
 		};
 
-		this["gradientlevel"] = function (x, y, level, deg) {
-
+		this.gradientlevel = function (x, y, level, deg) {
 			if (undefined === deg) deg = 1;
-
 			if (level > deg) return null;
 
 			var a = new xColor(x);
 			var b = new xColor(y);
 
 			if (a.success & b.success) {
-
-				a["r"] = (a["r"] + ((b["r"] - a["r"]) / deg) * level)|0;
-				a["g"] = (a["g"] + ((b["g"] - a["g"]) / deg) * level)|0;
-				a["b"] = (a["b"] + ((b["b"] - a["b"]) / deg) * level)|0;
-
+				a.r = (a.r + ((b.r - a.r) / deg) * level)|0;
+				a.g = (a.g + ((b.g - a.g) / deg) * level)|0;
+				a.b = (a.b + ((b.b - a.b) / deg) * level)|0;
 				return a;
 			}
 			return null;
 		};
 
-		this["gradientarray"] = function(arr, level, deg) {
-
+		this.gradientarray = function(arr, level, deg) {
 			if (level > deg || !arr.length) return null;
-
 			if (arr.length == 1) {
 				return new xColor(arr[0]);
 			}
@@ -1114,25 +1023,43 @@
 			var e = level * (arr.length - 1) / (deg + 1) | 0;
 			var step = deg / (arr.length - 1);
 
-			return $["xcolor"]["gradientlevel"](arr[e], arr[e + 1], level - e * step, step);
+			return $.xcolor.gradientlevel(arr[e], arr[e + 1], level - e * step, step);
 		};
 
-		this["nearestname"] = function (a) {
-
+		this.nearestname = function (a) {
 			a = new xColor(a);
-
 			if (a.success) {
-				return a["getName"]();
+				return a.getName();
 			}
 			return null;
 		};
 
-		this["darken"] = function (col, by, shade) {
-
+		this.darken = function (col, by, shade) {
 			if (undefined === by) {
 				by = 1;
-			} else if (by < 0) return this["lighten"](col, -by, shade);
+			} else if (by < 0) {
+				return this.lighten(col, -by, shade);
+			}
+			if (undefined === shade) {
+				shade = 32;
+			}
 
+			var c = new xColor(col);
+			if (c.success) {
+				if ((c.r -= shade * by) < 0) c.r = 0;
+				if ((c.g -= shade * by) < 0) c.g = 0;
+				if ((c.b -= shade * by) < 0) c.b = 0;
+				return c;
+			}
+			return null;
+		};
+
+		this.lighten = function (col, by, shade) {
+			if (undefined === by) {
+				by = 1;
+			} else if (by < 0) {
+				return this.darken(col, -by, shade);
+			}
 			if (undefined === shade) {
 				shade = 32;
 			}
@@ -1140,41 +1067,18 @@
 			var c = new xColor(col);
 
 			if (c.success) {
-				if ((c["r"]-= shade * by) < 0) c["r"] = 0;
-				if ((c["g"]-= shade * by) < 0) c["g"] = 0;
-				if ((c["b"]-= shade * by) < 0) c["b"] = 0;
+				if ((c.r+= shade * by) > 0xff) c.r = 0xff;
+				if ((c.g+= shade * by) > 0xff) c.g = 0xff;
+				if ((c.b+= shade * by) > 0xff) c.b = 0xff;
 				return c;
 			}
 			return null;
 		};
 
-		this["lighten"] = function (col, by, shade) {
-
-			if (undefined === by) {
-				by = 1;
-			} else if (by < 0) return this["darken"](col, -by, shade);
-
-			if (undefined === shade) {
-				shade = 32;
-			}
-
-			var c = new xColor(col);
-
-			if (c.success) {
-				if ((c["r"]+= shade * by) > 0xff) c["r"] = 0xff;
-				if ((c["g"]+= shade * by) > 0xff) c["g"] = 0xff;
-				if ((c["b"]+= shade * by) > 0xff) c["b"] = 0xff;
-				return c;
-			}
-			return null;
-		};
-
-		this["analogous"] = function (col, results, slices) {
-
+		this.analogous = function (col, results, slices) {
 			if (undefined === results) {
 				results = 8;
 			}
-
 			if (undefined === slices) {
 				slices = 30;
 			}
@@ -1183,12 +1087,12 @@
 
 			if (c.success) {
 
-				var hsv = c["getHSV"]();
+				var hsv = c.getHSV();
 				var part = 360 / slices, ret = [ c ];
 
-				for (hsv["h"] = ((hsv["h"] - (part * results >> 1)) + 720) % 360; --results; ) {
-					hsv["h"]+= part;
-					hsv["h"]%= 360;
+				for (hsv.h = ((hsv.h - (part * results >> 1)) + 720) % 360; --results; ) {
+					hsv.h+= part;
+					hsv.h%= 360;
 					ret.push(new xColor(hsv));
 				}
 				return ret;
@@ -1196,59 +1100,44 @@
 			return null;
 		};
 
-		this["complementary"] = function(col) {
-
+		this.complementary = function(col) {
 			var c = new xColor(col);
-
 			if(c.success) {
-
-				var hsl = c["getHSL"]();
-
-				hsl["h"] = (hsl["h"] + 180) % 360;
-
+				var hsl = c.getHSL();
+				hsl.h = (hsl.h + 180) % 360;
 				return new xColor(hsl);
 			}
 			return null;
 		};
 
-		this["splitcomplement"] = function (col) {
-
+		this.splitcomplement = function (col) {
 			var c = new xColor(col);
-
 			if (c.success) {
-
-				var hsv = c["getHSV"]();
-				var ret = [ c ];
-
-				hsv["h"]+= 72;
-				hsv["h"]%= 360;
+				var hsv = c.getHSV();
+				var ret = [c];
+				hsv.h += 72;
+				hsv.h %= 360;
 				ret.push(new xColor(hsv));
-
-				hsv["h"]+= 144;
-				hsv["h"]%= 360;
+				hsv.h += 144;
+				hsv.h %= 360;
 				ret.push(new xColor(hsv));
-
 				return ret;
 			}
 			return null;
 		};
 
-		this["monochromatic"] = function (col, results) {
-
+		this.monochromatic = function (col, results) {
 			if (undefined === results) {
 				results = 6;
 			}
 
 			var c = new xColor(col);
-
 			if (c.success) {
-
-				var hsv = c["getHSV"]();
+				var hsv = c.getHSV();
 				var ret = [ c ];
-
 				while (--results) {
-					hsv["v"]+= 20;
-					hsv["v"]%= 100;
+					hsv.v += 20;
+					hsv.v %= 100;
 					ret.push(new xColor(hsv));
 				}
 				return ret;
@@ -1257,29 +1146,24 @@
 		};
 	}
 
-	$["xcolor"] = new xColorMix();
+	$.xcolor = new xColorMix();
 
-	$["fn"]["readable"] = function () {
-
+	$.fn.readable = function () {
 		var elem = this[0];
 		var f = "";
 		var b = "";
 
 		do {
-
-			if ("" === f && ("transparent" === (f = $["curCSS"](elem, "color")) || "rgba(0, 0, 0, 0)" === f)) {
+			if ("" === f && ("transparent" === (f = $.curCSS(elem, "color")) || "rgba(0, 0, 0, 0)" === f)) {
 				f = "";
 			}
-
-			if ("" === b && ("transparent" === (b = $["curCSS"](elem, "backgroundColor")) || "rgba(0, 0, 0, 0)" === b)) {
+			if ("" === b && ("transparent" === (b = $.curCSS(elem, "backgroundColor")) || "rgba(0, 0, 0, 0)" === b)) {
 				b = "";
 			}
-
-			if ("" !== f && "" !== b || $["nodeName"](elem, "body")) {
+			if ("" !== f && "" !== b || $.nodeName(elem, "body")) {
 				break;
 			}
-
-		} while ((elem = elem["parentNode"]));
+		} while ((elem = elem.parentNode));
 
 		if ("" === f) {
 			f = "black";
@@ -1290,15 +1174,12 @@
 		}
 
 		// todo: if alpha != 1, use opacity() to calculate correct color on certain element and it's parent
-		return $["xcolor"]["readable"](b, f);
+		return $.xcolor.readable(b, f);
 	};
 
-	$["fn"]["colorize"] = function (FROM, TO, TYPE) {
-
+	$.fn.colorize = function (FROM, TO, TYPE) {
 		var modifiers = {
-
 			// Returns number in [0, 1] (0 = FROM, 1 = TO)
-
 			"gradient": function (k, l, diff, c) {
 				return k / l;
 			},
@@ -1324,23 +1205,16 @@
 		FROM = new xColor(FROM);
 		TO   = new xColor(TO);
 
-		this["each"](function() {
-
+		this.each(function() {
 			var tmp  = this.childNodes,
 				LEN  = 0,
 				K    = 0;
 
 			if (FROM.success & TO.success) {
-
-				for (var i = tmp.length; i--; LEN+= tmp[i]["textContent"].length){}
-
+				for (var i = tmp.length; i--; LEN+= tmp[i].textContent.length){}
 				(function replace(node) {
-
-					var i = 0,
-						len;
-
+					var i = 0, len;
 					if (3 === node.nodeType) {
-
 							var x = FROM;
 							var y = TO;
 							var l = LEN;
@@ -1350,35 +1224,28 @@
 							ctx = document.createElement('span');
 
 							for (i = 0; i < len; ++i) {
-
 								elem = document.createElement('span');
 								c    = node.nodeValue.charAt(i);
-
 								diff = calc(K, l, diff, c);
 
-								elem["style"]["color"] =_RGBAtoCSS(
-									x["r"] + diff * (y["r"] - x["r"])|0,
-									x["g"] + diff * (y["g"] - x["g"])|0,
-									x["b"] + diff * (y["b"] - x["b"])|0,
-									x["a"] + diff * (y["a"] - x["a"])
+								elem.style.color =_RGBAtoCSS(
+									x.r + diff * (y.r - x.r)|0,
+									x.g + diff * (y.g - x.g)|0,
+									x.b + diff * (y.b - x.b)|0,
+									x.a + diff * (y.a - x.a)
 								);
 
-								elem.appendChild(document.createTextNode(
-											c
-										)
-								);
+								elem.appendChild(document.createTextNode(c));
 								ctx.appendChild(elem);
 								++K;
 							}
 							node.parentNode.replaceChild(ctx, node);
-
 					} else {
 						for (len = node.childNodes.length; i < len; ++i) {
 							replace(node.childNodes[i]);
 						}
 					}
 				})(this);
-
 			}
 		});
 	};
